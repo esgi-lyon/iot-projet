@@ -1,0 +1,3 @@
+[submodule "Projet_IoT_DIY"]
+	path = Projet_IoT_DIY
+	url = ./Projet_IoT_DIY/
