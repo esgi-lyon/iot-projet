@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:1.5
+    container_name: mosquitto
+    ports:
+      - 1883:1883
+    volumes:
+      - ./mosquitto:/mosquitto/config:rw
+      - mosquitto:/mosquitto/data
+      - mosquitto:/mosquitto/log
+    restart: always
+    networks:
+      - internal
+
+  influxdb:
+    image: influxdb:1.7
+    container_name: influxdb
+    environment:
+      - DOCKER_INFLUXDB_INIT_ORG=iot
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin
+      - DOCKER_INFLUXDB_INIT_BUCKET=iot-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=mega-super-secret-123!
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+    restart: always
+    networks:
+      - internal
+
+  grafana:
+    image: grafana/grafana:5.4.3
+    container_name: grafana
+    depends_on:
+      - influxdb
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana:/var/lib/grafana
+    restart: always
+    networks:
+      - internal
+
+  # mqttbridge:
+  #   build: ../02-bridge
+  #   image: iothon/mqttbridge
+  #   container_name: mqttbridge
+  #   depends_on:
+  #     - mosquitto
+  #     - influxdb
+  #   restart: always
+  #   networks:
+  #     - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  mosquitto: { driver: local }
+  influxdb: { driver: local }
+  grafana: { driver: local }
