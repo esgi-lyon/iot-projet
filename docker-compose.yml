@@ -1,15 +1,13 @@
 version: '3'
 
 services:
-  mosquitto:
-    image: eclipse-mosquitto:1.5
-    container_name: mosquitto
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
     ports:
-      - 1883:1883
+      - 1880:1880
     volumes:
-      - ./mosquitto:/mosquitto/config:rw
-      - mosquitto:/mosquitto/data
-      - mosquitto:/mosquitto/log
+      - node-red:/data
     restart: always
     networks:
       - internal
@@ -27,6 +25,7 @@ services:
       - 8086:8086
     volumes:
       - influxdb:/var/lib/influxdb
+      - ./init.iql:/docker-entrypoint-initdb.d/init.iql:ro
     restart: always
     networks:
       - internal
@@ -60,6 +59,6 @@ networks:
     driver: bridge
 
 volumes:
-  mosquitto: { driver: local }
   influxdb: { driver: local }
   grafana: { driver: local }
+  node-red:
